@@ -45,7 +45,7 @@ router.post('/users/signup', async (req,res) => {
 
         if(emailUser) {
             req.flash("error_msg", "El E-mail ya fue utilizado");
-            res.redirect("/users/signup");
+            res.redirect("users/signup");
         }
 
         const user = new User({name, email, password});
