@@ -1,11 +1,12 @@
 const router = require('express').Router();
 const Note = require("../models/Note");
+const { isAuthenticated } = require('../helpers/auth');
 
-router.get('/notes/add', (req,res) => {
+router.get('/notes/add', isAuthenticated, (req,res) => {
     res.render('notes/add');
 });
 
-router.post('/notes/add', async (req,res) => {
+router.post('/notes/add', isAuthenticated, async (req,res) => {
     const {title, description} = req.body;
     const errors = [];
 
@@ -29,7 +30,7 @@ router.post('/notes/add', async (req,res) => {
     }
 });
 
-router.get('/notes/edit/:id', async (req,res) => {
+router.get('/notes/edit/:id', isAuthenticated, async (req,res) => {
     const note = await Note.findById(req.params.id);
     res.render('notes/edit', {note});
 });
@@ -45,13 +46,13 @@ router.put('/notes/edit/:id', async (req,res) => {
     res.redirect("/notes");
 });
 
-router.delete('/notes/delete/:id', async (req,res) => {
+router.delete('/notes/delete/:id', isAuthenticated, async (req,res) => {
     await Note.findByIdAndDelete(req.params.id);
     req.flash("success_msg", "Nota eliminada");
     res.redirect("/notes");
 });
 
-router.get('/notes', async (req,res) => {
+router.get('/notes', isAuthenticated, async (req,res) => {
     const notes = await Note.find().sort({date: 'desc'});
     res.render("notes/notes", {notes});
 });
