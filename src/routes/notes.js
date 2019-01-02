@@ -7,7 +7,7 @@ router.get('/notes/add', isAuthenticated, (req,res) => {
 });
 
 router.post('/notes/add', isAuthenticated, async (req,res) => {
-    const {title, description} = req.body;
+    const {title, description, public} = req.body;
     const errors = [];
 
     if(!title) {
@@ -20,10 +20,11 @@ router.post('/notes/add', isAuthenticated, async (req,res) => {
         res.render('notes/add', {
             errors,
             title,
-            description
+            description,
+            public
         });
     } else {
-        const newNote = new Note({title, description});
+        const newNote = new Note({title, description, public});
         newNote.user = req.user.id;
         await newNote.save();
         req.flash("success_msg", "Nota agregada");
@@ -37,11 +38,12 @@ router.get('/notes/edit/:id', isAuthenticated, async (req,res) => {
 });
 
 router.put('/notes/edit/:id', async (req,res) => {
-    const {title, description} = req.body;
+    const {title, description, public} = req.body;
 
     await Note.findByIdAndUpdate(req.params.id, {
         title, 
-        description
+        description,
+        public
     });
     req.flash("success_msg", "Nota editada");
     res.redirect("/notes");
@@ -55,6 +57,7 @@ router.delete('/notes/delete/:id', isAuthenticated, async (req,res) => {
 
 router.get('/notes', isAuthenticated, async (req,res) => {
     const notes = await Note.find({user: req.user.id}).sort({date: 'desc'});
+    const publicNotes = await Note.find({user:{$not: req.user.id}}).sort({date: 'desc'});;
     res.render("notes/notes", {notes});
 });
 
