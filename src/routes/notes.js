@@ -57,8 +57,8 @@ router.delete('/notes/delete/:id', isAuthenticated, async (req,res) => {
 
 router.get('/notes', isAuthenticated, async (req,res) => {
     const notes = await Note.find({user: req.user.id}).sort({date: 'desc'});
-    const publicNotes = await Note.find({user:{$not: req.user.id}}).sort({date: 'desc'});;
-    res.render("notes/notes", {notes});
+    const publicNotes = await Note.find({user:{$ne: req.user.id}, public: true}).sort({date: 'desc'}).populate('user');
+    res.render("notes/notes", {notes, publicNotes});
 });
 
 module.exports = router;
